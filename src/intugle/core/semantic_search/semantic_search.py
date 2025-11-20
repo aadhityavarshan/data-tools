@@ -27,12 +27,13 @@ log = logging.getLogger(__name__)
 class HybridDenseLateSearch:
     def __init__(
         self,
-        collection_name: str,
+        project_id: str,
         embeddings: Embeddings,
         threshold_for_less_relevant_result: float = 0.5,
         relevancy_config: Optional[dict] = None,
     ):
-        self.collection_name = collection_name
+        self.project_id = project_id
+        self.collection_name = project_id
         self.embeddings = embeddings
         self.threshold_for_less_relevant_result = threshold_for_less_relevant_result
 

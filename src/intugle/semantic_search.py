@@ -48,8 +48,9 @@ def _run_async_in_sync(coro: Awaitable[T]) -> T:
 
 class SemanticSearch:
     def __init__(
-        self, models_dir_path: str = settings.MODELS_DIR, collection_name: str = settings.VECTOR_COLLECTION_NAME
+        self, project_id: str = settings.PROJECT_ID, models_dir_path: str = settings.MODELS_DIR, collection_name: str = settings.VECTOR_COLLECTION_NAME
     ):
+        self.project_id = project_id
         self.manifest_loader = ManifestLoader(models_dir_path)
         self.manifest_loader.load()
         self.manifest = self.manifest_loader.manifest
@@ -115,7 +116,7 @@ class SemanticSearch:
 
     async def _async_initialize(self):
         embeddings = Embeddings(settings.EMBEDDING_MODEL_NAME, settings.TOKENIZER_MODEL_NAME)
-        semantic_search_crud = SemanticSearchCRUD(self.collection_name, [embeddings])
+        semantic_search_crud = SemanticSearchCRUD([embeddings], project_id=self.project_id)
         column_details = self.get_column_details()
         column_details = pd.DataFrame.from_records(column_details)
         await semantic_search_crud.initialize(column_details)
@@ -125,7 +126,7 @@ class SemanticSearch:
 
     async def _search_async(self, query):
         embeddings = Embeddings(settings.EMBEDDING_MODEL_NAME, settings.TOKENIZER_MODEL_NAME)
-        semantic_search = HybridDenseLateSearch(self.collection_name, embeddings)
+        semantic_search = HybridDenseLateSearch(embeddings, project_id=self.project_id)
 
         data = await semantic_search.search(string_standardization(query))
         return data
